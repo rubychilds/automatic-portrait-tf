@@ -90,7 +90,7 @@ class FCN8s:
         h = tf.shape(self.net['image'])[1]
         w = tf.shape(self.net['image'])[2]
         d = tf.shape(self.net['upscore8'])[3]
-        output_shape = tf.pack([b, h, w, d])
+        output_shape = tf.stack([b, h, w, d])
         self.net['score'] = tf.slice(self.net['upscore8'], [0, 31, 31, 0],
                                      output_shape)
 
@@ -135,7 +135,7 @@ class FCN8s:
         _, sh, sw, _ = strides
         kh, kw, _, _ = shape
 
-        output_shape = tf.pack([b, sh * (h - 1) + kh, sw * (w - 1) + kw, d])
+        output_shape = tf.stack([b, sh * (h - 1) + kh, sw * (w - 1) + kw, d])
 
         self.net[layer_name] = tf.nn.conv2d_transpose(
             input_layer, weight, output_shape, strides=strides,

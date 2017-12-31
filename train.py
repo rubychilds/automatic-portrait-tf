@@ -64,21 +64,21 @@ def train(net):
     with tf.Session() as sess:
         global_step = tf.Variable(0, name='global_step', trainable=False)
 
-        saver = tf.train.Saver(tf.all_variables())
+        saver = tf.train.Saver(tf.global_variables())
         model_file = tf.train.latest_checkpoint('./model/')
         if model_file:
             print('Restore from {}'.format(model_file))
             saver.restore(sess, model_file)
         else:
             print('Initialize')
-            sess.run(tf.initialize_all_variables())
+            sess.run(tf.global_variables_initializer())
             fcn.set_default_value(sess, load_caffe_model(), LAYER_ID_MAP)
 
         print('Start')
         label = tf.placeholder(tf.uint8, shape=[None, None, None])
         cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
-            tf.reshape(net['score'], [-1, 2]),
-            tf.one_hot(tf.reshape(label, [-1]), 2)))
+                                    labels=tf.reshape(net['score'], [-1, 2]),
+                                    logits=tf.one_hot(tf.reshape(label, [-1]), 2)))
         optimizer = tf.train.GradientDescentOptimizer(1e-4)
         train_op = optimizer.minimize(cost, global_step=global_step)
 
